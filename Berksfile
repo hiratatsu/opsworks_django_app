@@ -1,5 +1,4 @@
-#source 'https://api.berkshelf.com' # for version 3
-site :opscode  # for version 2
+source "https://supermarket.chef.io"
 
 cookbook 'python'
 # 2014-07-31
