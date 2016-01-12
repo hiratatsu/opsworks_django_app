@@ -19,8 +19,9 @@ include_recipe 'common::postgresql'
 include_recipe 'common::postfix'
 
 include_recipe 'common::repository'
+
 app_directory = "#{node[:app][:directory]}/#{node[:app][:host]}"
-# place credential files.
+# place credential files. (downloadcertificate command needs these files.)
 template "#{app_directory}/#{node[:app][:name]}/#{node[:app][:name]}/settings/settings_base_credential.py" do
   source 'settings_base_credential.py.erb'
   owner node[:app][:owner]
@@ -32,6 +33,14 @@ template "#{app_directory}/#{node[:app][:name]}/#{node[:app][:name]}/settings/#{
   owner node[:app][:owner]
   group node[:app][:group]
   action :create
+end
+
+# downloadcertificate
+bash "manage.py" do
+  cwd "#{app_directory}/#{node[:app][:name]}"
+  user node[:app][:owner]
+  group node[:app][:group]
+  code "#{node[:virtualenv][:path]}/bin/python manage.py downloadcertificate --settings=#{node[:app][:django_settings]}"
 end
 
 include_recipe 'common::keyczar'

@@ -10,6 +10,20 @@ git app_directory do
   action :sync
 end
 
+# update credential files.
+template "#{app_directory}/#{node[:app][:name]}/#{node[:app][:name]}/settings/settings_base_credential.py" do
+  source 'settings_base_credential.py.erb'
+  owner node[:app][:owner]
+  group node[:app][:group]
+  action :create
+end
+template "#{app_directory}/#{node[:app][:name]}/#{node[:app][:name]}/settings/#{node[:app][:credential]}" do
+  source 'settings_env_credential.py.erb'
+  owner node[:app][:owner]
+  group node[:app][:group]
+  action :create
+end
+
 # pip install
 bash "pip install -r requirements.txt" do
   cwd app_directory
@@ -38,13 +52,12 @@ bash "grunt #{node[:app][:grunt_target]}" do
   EOC
 end
 
-# downloadcertificate, collectstatic, clearcache, migrate
+# collectstatic, migrate
 bash "manage.py" do
   cwd "#{app_directory}/#{node[:app][:name]}"
   user node[:app][:owner]
   group node[:app][:group]
-  code "#{node[:virtualenv][:path]}/bin/python manage.py downloadcertificate --settings=#{node[:app][:django_settings]} && " +
-       "#{node[:virtualenv][:path]}/bin/python manage.py collectstatic --noinput --settings=#{node[:app][:django_settings]} && " +
+  code "#{node[:virtualenv][:path]}/bin/python manage.py collectstatic --noinput --settings=#{node[:app][:django_settings]} && " +
        "#{node[:virtualenv][:path]}/bin/python manage.py migrate --settings=#{node[:app][:django_settings]}"
 end
 
