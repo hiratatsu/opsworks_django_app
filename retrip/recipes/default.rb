@@ -35,6 +35,9 @@ template "#{app_directory}/#{node[:app][:name]}/#{node[:app][:name]}/settings/#{
   action :create
 end
 
+# keyczar is needed to run manage.py.
+include_recipe 'common::keyczar'
+
 # downloadcertificate
 bash "manage.py" do
   cwd "#{app_directory}/#{node[:app][:name]}"
@@ -42,8 +45,6 @@ bash "manage.py" do
   group node[:app][:group]
   code "#{node[:virtualenv][:path]}/bin/python manage.py downloadcertificate --settings=#{node[:app][:django_settings]}"
 end
-
-include_recipe 'common::keyczar'
 
 # supervisor must be called before gunicorn and celeryd.
 include_recipe 'supervisor'
