@@ -1,5 +1,7 @@
 source "https://supermarket.chef.io"
 
+# build-essential 2.3.0 contains bug.
+cookbook 'build-essential', '= 2.2.4'
 cookbook 'python'
 # 2014-07-31
 cookbook 'supervisor', github: 'poise/supervisor', ref: 'e5ad4bf21c2aa4dc56e7bad84b836d897a87dedf'
