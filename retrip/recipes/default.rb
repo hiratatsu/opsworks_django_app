@@ -39,7 +39,7 @@ end
 include_recipe 'common::keyczar'
 
 # install APNs key
-s3_file node[:apns][:key_path] do
+s3_file "#{app_directory}/#{node[:apns][:key_path]}" do
   remote_path node[:apns][:key_s3]
   aws_access_key_id node[:aws][:key]
   aws_secret_access_key node[:aws][:secret]
@@ -47,7 +47,7 @@ s3_file node[:apns][:key_path] do
   owner node[:app][:owner]
   group node[:app][:group]
   mode 0644
-  not_if { ::File.exists?(node[:apns][:key_path]) }
+  not_if { ::File.exists?("#{app_directory}/#{node[:apns][:key_path]}") }
 end
 
 # downloadcertificate
