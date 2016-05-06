@@ -38,6 +38,18 @@ end
 # keyczar is needed to run manage.py.
 include_recipe 'common::keyczar'
 
+# install APNs key
+s3_file node[:apns][:key_path] do
+  remote_path node[:apns][:key_s3]
+  aws_access_key_id node[:aws][:key]
+  aws_secret_access_key node[:aws][:secret]
+  bucket node[:aws][:s3_bucket]
+  owner node[:app][:owner]
+  group node[:app][:group]
+  mode 0644
+  not_if { ::File.exists?(node[:apns][:key_path]) }
+end
+
 # downloadcertificate
 bash "manage.py" do
   cwd "#{app_directory}/#{node[:app][:name]}"
