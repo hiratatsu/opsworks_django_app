@@ -1,7 +1,7 @@
 include_recipe 'common::virtualenv'
 
 # install required packages.
-%w{libmemcached libmemcached-devel npm libjpeg-devel}.each do |pkg|
+%w{libmemcached libmemcached-devel npm libjpeg-devel pandoc}.each do |pkg|
   package pkg do
     action :upgrade
   end
