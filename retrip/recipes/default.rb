@@ -38,6 +38,15 @@ end
 # keyczar is needed to run manage.py.
 include_recipe 'common::keyczar'
 
+# create APNs certificates directory first.
+directory File.dirname("#{app_directory}/#{node[:apns][:key_path]}") do
+  owner node[:app][:owner]
+  group node[:app][:group]
+  mode '0755'
+  action :create
+  not_if { ::File.exists?(File.dirname("#{app_directory}/#{node[:apns][:key_path]}")) }
+end
+
 # install APNs key
 s3_file "#{app_directory}/#{node[:apns][:key_path]}" do
   remote_path node[:apns][:key_s3]
