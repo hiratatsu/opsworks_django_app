@@ -1,5 +1,7 @@
 source "https://supermarket.chef.io"
 
+# apt 4.0.0 breaks backward compatibility with Chef 11.
+cookbook 'apt', '= 3.0.0'
 # build-essential 2.3.0 contains bug.
 cookbook 'build-essential', '= 2.2.4'
 cookbook 'python'
