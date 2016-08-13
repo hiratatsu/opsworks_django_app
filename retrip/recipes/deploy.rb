@@ -31,7 +31,7 @@ bash "pip install -r requirements.txt" do
   group node[:app][:group]
   code <<-EOC
   export HOME=~#{node[:app][:owner]}
-  export PATH=$PATH:/usr/pgsql-9.4/bin
+  export PATH=$PATH:/usr/pgsql-9.5/bin
   #{node[:virtualenv][:path]}/bin/pip install -r requirements.txt
   EOC
 end

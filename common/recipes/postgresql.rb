@@ -8,12 +8,12 @@
   end
 end
 
-bash 'add a repository and install postgresql 9.4' do
+bash 'add a repository and install postgresql 9.5' do
   code <<-EOC
-  rpm -ivh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-redhat94-9.4-2.noarch.rpm
-  yum-config-manager --disable pgdg94
+  rpm -ivh http://yum.postgresql.org/9.5/redhat/rhel-7-x86_64/pgdg-redhat95-9.5-2.noarch.rpm
+  yum-config-manager --disable pgdg95
   yum erase -y postgresql92 postgresql92-devel postgresql92-libs postgresql93 postgresql93-devel postgresql93-libs
-  yum --disablerepo="*" --enablerepo="pgdg94" --releasever="7" install -y postgresql94-devel postgis2_94
+  yum --disablerepo="*" --enablerepo="pgdg95" --releasever="7" install -y postgresql95-devel postgis2_95
   EOC
 end
 
@@ -22,4 +22,4 @@ cookbook_file "/etc/profile.d/pgsql.sh" do
   source "pgsql.sh"
 end
 # set it temporarily.
-ENV['PATH'] += ":/usr/pgsql-9.4/bin"
+ENV['PATH'] += ":/usr/pgsql-9.5/bin"
