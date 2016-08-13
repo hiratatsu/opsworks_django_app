@@ -10,10 +10,10 @@ end
 
 bash 'add a repository and install postgresql 9.5' do
   code <<-EOC
-  rpm -ivh http://yum.postgresql.org/9.5/redhat/rhel-7-x86_64/pgdg-redhat95-9.5-2.noarch.rpm
+  rpm -ivh https://download.postgresql.org/pub/repos/yum/9.5/redhat/rhel-6-x86_64/pgdg-ami201503-95-9.5-2.noarch.rpm
   yum-config-manager --disable pgdg95
   yum erase -y postgresql92 postgresql92-devel postgresql92-libs postgresql93 postgresql93-devel postgresql93-libs
-  yum --disablerepo="*" --enablerepo="pgdg95" --releasever="7" install -y postgresql95-devel postgis2_95
+  yum --disablerepo="*" --enablerepo="pgdg95" --releasever="6" install -y postgresql95-devel postgis2_95
   EOC
 end
 
