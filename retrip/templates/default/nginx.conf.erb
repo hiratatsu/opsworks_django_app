@@ -1,0 +1,65 @@
+user <%= node[:nginx][:user] %>;
+worker_processes  <%= (node[:cpu] && node[:cpu][:total]) && node[:cpu][:total] || 1 %>;
+worker_rlimit_nofile  <%= node[:nginx][:worker_rlimit_nofile] %>;
+
+error_log  <%= node[:nginx][:log_dir] %>/error.log;
+pid        /var/run/nginx.pid;
+
+events {
+  worker_connections <%= node[:nginx][:worker_connections] %>;
+  multi_accept on;
+  use epoll;
+}
+
+http {
+  include       <%= node[:nginx][:dir] %>/mime.types;
+  default_type  application/octet-stream;
+
+  <% node[:nginx][:log_format].each do |name, format| %>
+  log_format <%= name %> <%= format %>;
+  <% end %>
+
+  access_log	<%= node[:nginx][:log_dir] %>/access.log;
+
+  sendfile on;
+  tcp_nopush on;
+  tcp_nodelay on;
+
+  <% if node[:nginx][:keepalive] == "on" %>
+  keepalive_timeout  <%= node[:nginx][:keepalive_timeout] %>;
+  <% end %>
+
+  gzip  <%= node[:nginx][:gzip] %>;
+  gzip_static  <%= node[:nginx][:gzip_static] %>;
+  <% if node[:nginx][:gzip] == "on" %>
+  gzip_http_version <%= node[:nginx][:gzip_http_version] %>;
+  gzip_comp_level <%= node[:nginx][:gzip_comp_level] %>;
+  gzip_proxied <%= node[:nginx][:gzip_proxied] %>;
+  gzip_types <%= node[:nginx][:gzip_types].join(' ') %>;
+  gzip_vary <%= node[:nginx][:gzip_vary] %>;
+  gzip_disable "<%= node[:nginx][:gzip_disable] %>";
+  <% end %>
+
+  client_max_body_size <%= node[:nginx][:client_max_body_size] %>;
+
+  server_names_hash_bucket_size <%= node[:nginx][:server_names_hash_bucket_size] %>;
+
+  # avoid "upstream sent too big header" error. See http://stackoverflow.com/a/27551259
+  proxy_buffer_size 32k;
+  proxy_buffers 8 32k;
+  proxy_busy_buffers_size 64k;
+
+  # connection timeout
+  proxy_read_timeout <%= node[:nginx][:proxy_read_timeout] %>;
+  proxy_send_timeout <%= node[:nginx][:proxy_send_timeout] %>;
+
+  # security
+  server_tokens off;
+  add_header X-Content-Type-Options nosniff;
+  add_header X-XSS-Protection "1; mode=block";
+  add_header Content-Security-Policy "default-src https: 'unsafe-eval' 'unsafe-inline'";
+  add_header Strict-Transport-Security "max-age=31536000";
+
+  include <%= node[:nginx][:dir] %>/conf.d/*.conf;
+  include <%= node[:nginx][:dir] %>/sites-enabled/*;
+}
