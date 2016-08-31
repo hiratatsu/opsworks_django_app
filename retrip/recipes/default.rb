@@ -81,6 +81,11 @@ include_recipe 'common::dynamic_dynamodb'
 
 include_recipe 'common::nginx'
 
+# install additional nginx config.
+cookbook_file "/etc/nginx/conf.d/security.conf" do
+  source "nginx-security.conf"
+end
+
 # install api site-config
 unless node[:app][:api_host].empty?
   nginx_web_app node[:app][:api_host] do
