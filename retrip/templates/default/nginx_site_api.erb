@@ -16,7 +16,7 @@ server {
         autoindex off;
     }
 
-    location ~ uploadimage {
+    location ~ /uploadimage/ {
         client_max_body_size 15M;
         proxy_pass http://127.0.0.1:8000;
     }
