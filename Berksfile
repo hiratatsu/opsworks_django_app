@@ -1,5 +1,7 @@
 source "https://supermarket.chef.io"
 
+# opsworks depends on ohai and the newer versions are not compatible with Chef 11.
+cookbook 'ohai', '= 3.0.1'
 # apt 4.0.0 breaks backward compatibility with Chef 11.
 cookbook 'apt', '= 3.0.0'
 # build-essential 2.3.0 contains bug.
