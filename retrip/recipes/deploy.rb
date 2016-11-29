@@ -76,16 +76,6 @@ else
   end
 end
 
-# clearcache after the restart of gunicorn.
-bash "manage.py clearcache" do
-  cwd "#{app_directory}/#{node[:app][:name]}"
-  user node[:app][:owner]
-  group node[:app][:group]
-  code <<-EOC
-  #{node[:virtualenv][:path]}/bin/python manage.py clearcache --settings=#{node[:app][:django_settings]}
-  EOC
-end
-
 # start or reload celeryd depending on the current status.
 if `supervisorctl status celeryd-#{node[:app][:name]} | awk '{print $2}'` =~ /^RUNNING$/
   # reload it.
@@ -99,9 +89,4 @@ else
   supervisor_service "celeryd-#{node[:app][:name]}" do
     action :restart
   end
-end
-
-# restart celery beat.
-supervisor_service "celerybeat-#{node[:app][:name]}" do
-  action :restart
 end
