@@ -38,6 +38,16 @@ end
 # keyczar is needed to run manage.py.
 include_recipe 'common::keyczar'
 
+# create APNs certificates directory first.
+directory File.dirname("#{app_directory}/#{node[:apns][:key_path]}") do
+  owner node[:app][:owner]
+  group node[:app][:group]
+  mode '0755'
+  recursive true
+  action :create
+  not_if { ::File.exists?(File.dirname("#{app_directory}/#{node[:apns][:key_path]}")) }
+end
+
 # install APNs key
 s3_file "#{app_directory}/#{node[:apns][:key_path]}" do
   remote_path node[:apns][:key_s3]
@@ -65,11 +75,14 @@ include_recipe 'common::gunicorn'
 
 include_recipe 'common::celeryd'
 
-include_recipe 'common::celerybeat'
-
 include_recipe 'common::dynamic_dynamodb'
 
 include_recipe 'common::nginx'
+
+# install additional nginx config.
+cookbook_file "/etc/nginx/conf.d/security.conf" do
+  source "nginx-security.conf"
+end
 
 # install api site-config
 unless node[:app][:api_host].empty?

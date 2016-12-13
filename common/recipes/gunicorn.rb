@@ -13,7 +13,7 @@ gunicorn_config_path = "/etc/gunicorn/#{node[:app][:name]}.py"
 
 gunicorn_config gunicorn_config_path do
   listen '127.0.0.1:8000'
-  worker_processes (node['cpu'] && node['cpu']['total']) && [node['cpu']['total'].to_i * 2 + 1, 4].max || 4
+  worker_processes (node['cpu'] && node['cpu']['total']) && [node['cpu']['total'].to_i * 4, 4].max || 4
   worker_max_requests node['gunicorn']['worker_max_requests']
   worker_timeout node['gunicorn']['worker_timeout']
 #  threads (node['cpu'] && node['cpu']['total']) && [node['cpu']['total'].to_i * 2 + 1, 12].min || 4

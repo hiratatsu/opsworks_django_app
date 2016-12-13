@@ -1,3 +1,12 @@
+<%- if node[:nginx][:custom_block_referer].any? %>
+map $http_referer $bad_referer {
+    default 0;
+    <% node[:nginx][:custom_block_referer].each do |referer| %>
+    "~<%= referer %>" 1;
+    <% end %>
+}
+<%- end %>
+
 server {
     listen   80;
 <% if node[:app][:default_server_name].empty? %>
@@ -20,7 +29,7 @@ server {
         autoindex off;
     }
 
-    location /utils/uploadimage/ {
+    location ~ /uploadimage/ {
         client_max_body_size 15M;
         proxy_pass http://127.0.0.1:8000;
     }
@@ -55,6 +64,11 @@ server {
         deny all;
     }
 
+<%- if node[:nginx][:custom_block_referer].any? %>
+    if ($bad_referer) {
+        return 444;
+    }
+<%- end %>
 }
 
 # block requests without valid domain.

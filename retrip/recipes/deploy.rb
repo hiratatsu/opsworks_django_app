@@ -31,7 +31,7 @@ bash "pip install -r requirements.txt" do
   group node[:app][:group]
   code <<-EOC
   export HOME=~#{node[:app][:owner]}
-  export PATH=$PATH:/usr/pgsql-9.4/bin
+  export PATH=$PATH:/usr/pgsql-9.5/bin
   #{node[:virtualenv][:path]}/bin/pip install -r requirements.txt
   EOC
 end
@@ -76,19 +76,17 @@ else
   end
 end
 
-# clearcache after the restart of gunicorn.
-bash "manage.py clearcache" do
-  cwd "#{app_directory}/#{node[:app][:name]}"
-  user node[:app][:owner]
-  group node[:app][:group]
-  code <<-EOC
-  #{node[:virtualenv][:path]}/bin/python manage.py clearcache --settings=#{node[:app][:django_settings]}
-  EOC
-end
-
-# restart celery services.
-%W{celeryd-#{node[:app][:name]} celerybeat-#{node[:app][:name]}}.each do |srv|
-  supervisor_service srv do
+# start or reload celeryd depending on the current status.
+if `supervisorctl status celeryd-#{node[:app][:name]} | awk '{print $2}'` =~ /^RUNNING$/
+  # reload it.
+  bash "reload celeryd" do
+    code <<-EOC
+    supervisorctl status celeryd-#{node[:app][:name]} | awk '{gsub(/,$/, "", $4); print $4}' | xargs kill -HUP
+    EOC
+  end
+else
+  # or start it.
+  supervisor_service "celeryd-#{node[:app][:name]}" do
     action :restart
   end
 end
